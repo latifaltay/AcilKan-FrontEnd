@@ -53,7 +53,7 @@ function App() {
               <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
               {/* Protected Routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/home" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/user/:userId" element={<ProtectedRoute><UserProfileView /></ProtectedRoute>} />

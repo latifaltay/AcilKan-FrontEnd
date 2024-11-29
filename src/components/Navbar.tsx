@@ -15,16 +15,17 @@ export default function Navbar() {
   useClickOutside(profileDropdownRef, () => {
     setIsProfileOpen(false);
   });
+  const { user } = useAuth();  // Ensure 'user' is coming from your auth context
 
   const handleLogout = () => {
     logout();
     setIsProfileOpen(false);
   };
-
+  
   const AuthenticatedNav = () => (
     <>
       <div className="hidden md:flex items-center space-x-4">
-        <Link to="/dashboard" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link to="/home" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
           Anasayfa
         </Link>
         <Link to="/activeUser" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
@@ -46,11 +47,18 @@ export default function Navbar() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white">
-              {/* {user?.name.split(' ').map(n => n[0]).join('')} */}
-            </div>
-          </button>
 
+        {/* bakılacak */}
+        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white">
+          {user?.name?.[1]?.toUpperCase() || 'X'}
+          {/* {user?.surname?.[0]?.toUpperCase() || 'X'} */}
+        </div>
+
+
+
+
+          </button>
+          
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-50">
               <Link
@@ -92,7 +100,7 @@ export default function Navbar() {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
-              to="/dashboard"
+              to="/home"
               className="block text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsOpen(false)}
             >
@@ -138,6 +146,7 @@ export default function Navbar() {
     </>
   );
 
+  
   const UnauthenticatedNav = () => (
     <>
       <div className="hidden md:flex items-center space-x-4">

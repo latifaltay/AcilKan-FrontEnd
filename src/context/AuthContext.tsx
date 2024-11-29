@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 interface User {
   id: string;
@@ -14,6 +15,12 @@ interface AuthContextType {
   logout: () => void;
 }
 
+interface LoginResponse {
+  message: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -25,30 +32,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('https://localhost:7132/api/AppUser/Login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await api.post<LoginResponse>('/AppUser/Login', {
+        email,
+        password
       });
 
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
+      const { accessToken, refreshToken } = response.data;
 
-      const data = await response.json();
+      // Store tokens
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // Parse JWT token to get user info
+      const base64Url = accessToken.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      const tokenData = JSON.parse(jsonPayload);
       
-      // Assuming the API returns user data in the format we need
-      const userData = {
-        id: data.id,
-        name: data.name,
-        email: data.email
+      // Create user object from token claims
+      const userData: User = {
+        id: tokenData.sub,
+        name: tokenData['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+        email: tokenData['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
       };
 
-      setUser(userData);
+      // Store user data
       localStorage.setItem('user', JSON.stringify(userData));
-      navigate('/dashboard');
+      setUser(userData);
+
+      // Configure axios default headers
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+      // Navigate to dashboard
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -57,14 +76,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    delete api.defaults.headers.common['Authorization'];
     navigate('/login');
   };
 
+  // Set up initial auth header if token exists
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, []);
 

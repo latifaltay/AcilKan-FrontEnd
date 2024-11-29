@@ -17,10 +17,33 @@ interface BloodRequest {
 interface Props {
   request: BloodRequest;
   onContact?: () => void;
-  onDonate?: () => void;
+  onDonate?: (bloodRequestId: number) => void;
 }
 
 export default function BloodRequestCard({ request, onContact, onDonate }: Props) {
+  const handleDonate = async () => {
+    try {
+      const response = await fetch('https://localhost:7132/api/BloodDonation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bloodRequestId: request.id,
+          isActive: true,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Bağış isteği başarıyla gönderildi!');
+      } else {
+        console.error('Bağış isteği başarısız oldu:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Bağış isteği sırasında hata oluştu:', error);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border-l-4 border-red-600">
       <div className="flex justify-between items-start mb-3">
@@ -50,14 +73,14 @@ export default function BloodRequestCard({ request, onContact, onDonate }: Props
         </p>
       </div>
       <div className="flex space-x-2">
-        <button 
+        <button
           onClick={onContact}
           className="flex-1 text-xs bg-red-600 text-white px-2 py-1.5 rounded hover:bg-red-700 transition-colors"
         >
           İletişime Geç
         </button>
-        <button 
-          onClick={onDonate}
+        <button
+          onClick={handleDonate}
           className="flex-1 text-xs border border-red-600 text-red-600 px-2 py-1.5 rounded hover:bg-red-50 transition-colors"
         >
           Bağış Yap

@@ -19,8 +19,15 @@ function Login() {
 
     try {
       await login(formData.email, formData.password);
-    } catch (error) {
-      setErrorMessage('Giriş bilgileri hatalı. Lütfen kontrol ediniz.');
+      // Navigation is handled in the AuthContext after successful login
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        setErrorMessage('E-posta veya şifre hatalı.');
+      } else if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
+      }
     } finally {
       setLoading(false);
     }

@@ -10,7 +10,8 @@ export function PublicRoute({ children }: PublicRouteProps) {
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    // emin değilim kontrol edilecek
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;
