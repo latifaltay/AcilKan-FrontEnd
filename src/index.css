@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.organization-slider {
+  padding: 20px 0 40px 0;
+}
+
+.organization-slider .swiper-slide {
+  height: auto !important;
+}
+
+.organization-slider .swiper-button-next,
+.organization-slider .swiper-button-prev {
+  color: #dc2626;
+  background-color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.organization-slider .swiper-button-next:after,
+.organization-slider .swiper-button-prev:after {
+  font-size: 16px;
+}
+
+.organization-slider .swiper-pagination-bullet {
+  background: #dc2626;
+  width: 8px;
+  height: 8px;
+}
+
+.organization-slider .swiper-pagination-bullet-active {
+  background: #dc2626;
+}
+
+.dark .organization-slider .swiper-button-next,
+.dark .organization-slider .swiper-button-prev {
+  background-color: #374151;
+  color: white;
+}
+
+.organization-slider .swiper-wrapper {
+  align-items: stretch;
+}
+
+.organization-slider .swiper-slide > div {
+  height: 100%;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
