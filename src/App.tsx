@@ -24,6 +24,8 @@ import { AccountSettings } from './pages/AccountSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { useScrollToTop } from './hooks/useScrollToTop';
+import NewMessage from './pages/NewMessage';
+import { BloodDonationProvider } from './context/BloodDonationContext';
 
 function ScrollToTop() {
   useScrollToTop();
@@ -35,6 +37,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <ThemeProvider>
+          <BloodDonationProvider>
           <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
             <ScrollToTop />
             <Navbar />
@@ -59,12 +62,13 @@ function App() {
               <Route path="/user/:userId" element={<ProtectedRoute><UserProfileView /></ProtectedRoute>} />
               <Route path="/activeUser" element={<ProtectedRoute><ActiveUsersPage /></ProtectedRoute>} />
               <Route path="/AccountSettings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
-
+              <Route path="/messages/new" element={<ProtectedRoute><NewMessage /></ProtectedRoute>} />
               {/* Error Page */}
               <Route path="*" element={<ErrorPage />} />
             </Routes>
             <Footer />
           </div>
+          </BloodDonationProvider>
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

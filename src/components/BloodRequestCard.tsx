@@ -1,8 +1,13 @@
 import { MapPin, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import { getRelativeTime } from '../utils/date';
+import { useContext } from 'react';
+import { BloodDonationContext } from '../context/BloodDonationContext';
 
 interface BloodRequest {
   id: number;
+  appUserId: number;
   appUserFullName: string;
   bloodGroupName: string | null;
   hospitalName: string;
@@ -16,28 +21,29 @@ interface BloodRequest {
 
 interface Props {
   request: BloodRequest;
-  onContact?: () => void;
-  onDonate?: (bloodRequestId: number) => void;
 }
 
-export default function BloodRequestCard({ request, onContact, onDonate }: Props) {
+export default function BloodRequestCard({ request }: Props) {
+  const navigate = useNavigate();
+
+  const {setSelectedBloodRequestId} =  useContext(BloodDonationContext)
+
+  const handleContact = () => {
+    setSelectedBloodRequestId(request.id);
+
+    navigate("/messages/new")
+  };
+console.log("AAAAAAAAA: ",request)
+
   const handleDonate = async () => {
     try {
-      const response = await fetch('https://localhost:7132/api/BloodDonation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bloodRequestId: request.id,
-          isActive: true,
-        }),
+      const response = await api.post('/BloodDonation', {
+        bloodRequestId: request.id,
+        isActive: true,
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         console.log('Bağış isteği başarıyla gönderildi!');
-      } else {
-        console.error('Bağış isteği başarısız oldu:', response.statusText);
       }
     } catch (error) {
       console.error('Bağış isteği sırasında hata oluştu:', error);
@@ -74,7 +80,7 @@ export default function BloodRequestCard({ request, onContact, onDonate }: Props
       </div>
       <div className="flex space-x-2">
         <button
-          onClick={onContact}
+          onClick={handleContact}
           className="flex-1 text-xs bg-red-600 text-white px-2 py-1.5 rounded hover:bg-red-700 transition-colors"
         >
           İletişime Geç

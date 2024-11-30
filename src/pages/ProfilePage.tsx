@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface DonationHistory {
   id: number;
@@ -167,7 +167,8 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* Bağış Geçmişi */}
+
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-bold text-gray-800 mb-6">Bağış Geçmişi</h3>
             
@@ -206,10 +207,16 @@ export function ProfilePage() {
                       Tarih
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Konum
+                      Hasta Adı Soyadı
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tür
+                      Hastane Adı
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Durum
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Onay
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Durum
@@ -223,10 +230,16 @@ export function ProfilePage() {
                         {donation.date}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        {donation.location}
+                        {/* {donation.patientName} */}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {/* {donation.hospitalName} */}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         {donation.type}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {donation.approval ? 'Onaylandı' : 'Bekliyor'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(donation.status)}`}>
@@ -244,6 +257,7 @@ export function ProfilePage() {
               )}
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,6 +1,11 @@
 import api from './api';
 import * as signalR from '@microsoft/signalr';
 
+interface Message {
+  toUserId: string;
+  content: string;
+}
+
 class ChatService {
   private hubConnection: signalR.HubConnection;
   private messageCallbacks: ((message: any) => void)[] = [];
@@ -37,24 +42,31 @@ class ChatService {
     }
   }
 
-  async getChats(toUserId: string) {
-    try {
-      const response = await api.get(`/Chat/GetChats?toUserId=${toUserId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching chats:', error);
-      throw error;
-    }
+  onMessage(callback: (message: any) => void) {
+    this.messageCallbacks.push(callback);
+    return () => {
+      this.messageCallbacks = this.messageCallbacks.filter(cb => cb !== callback);
+    };
   }
 
-  async sendMessage(message: { toUserId: string; content: string }) {
-    try {
-      const response = await api.post('/Chat/SendMessage', message);
-      return response.data;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      throw error;
-    }
+  async getContacts() {
+    const response = await api.get('/Chat/GetContacts');
+    return response.data;
+  }
+
+  async getChats(toUserId: string) {
+    const response = await api.get(`/Chat/GetChats?toUserId=${toUserId}`);
+    return response.data;
+  }
+
+  async sendMessage(message: Message) {
+    const response = await api.post('/Chat/SendMessage', message);
+    return response.data;
+  }
+
+  async deleteChat(contactId: string) {
+    const response = await api.delete(`/Chat/DeleteChat/${contactId}`);
+    return response.data;
   }
 
   async stop() {
