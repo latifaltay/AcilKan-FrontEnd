@@ -32,11 +32,10 @@ export interface BloodRequest {
 
 export interface Contact {
   id: number;
-  name: string;
-  lastMessage: string;
-  timestamp: string;
+  userFullName: string;
+  lastMessageInfo: string;
+  dateOnly : string;
   unread: number;
-  avatar: string;
 }
 
 export interface Message {
@@ -45,4 +44,6 @@ export interface Message {
   text: string;
   timestamp: string;
   isOwn: boolean;
+  content: string;
+  read?: boolean;
 }

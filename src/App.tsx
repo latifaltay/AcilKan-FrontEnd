@@ -24,7 +24,6 @@ import { AccountSettings } from './pages/AccountSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { useScrollToTop } from './hooks/useScrollToTop';
-import NewMessage from './pages/NewMessage';
 import { BloodDonationProvider } from './context/BloodDonationContext';
 
 function ScrollToTop() {
@@ -62,7 +61,6 @@ function App() {
               <Route path="/user/:userId" element={<ProtectedRoute><UserProfileView /></ProtectedRoute>} />
               <Route path="/activeUser" element={<ProtectedRoute><ActiveUsersPage /></ProtectedRoute>} />
               <Route path="/AccountSettings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
-              <Route path="/messages/new" element={<ProtectedRoute><NewMessage /></ProtectedRoute>} />
               {/* Error Page */}
               <Route path="*" element={<ErrorPage />} />
             </Routes>

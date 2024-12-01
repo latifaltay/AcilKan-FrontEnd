@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
 }

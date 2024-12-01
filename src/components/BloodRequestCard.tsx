@@ -31,7 +31,7 @@ export default function BloodRequestCard({ request }: Props) {
   const handleContact = () => {
     setSelectedBloodRequestId(request.id);
 
-    navigate("/messages/new")
+    navigate("/messages")
   };
 console.log("AAAAAAAAA: ",request)
 

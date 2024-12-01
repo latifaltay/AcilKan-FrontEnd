@@ -1,8 +1,9 @@
 import api from './api';
 import * as signalR from '@microsoft/signalr';
+import {Contact, Message as MessageType} from '../types' 
 
 interface Message {
-  toUserId: string;
+  toUserId: number;
   content: string;
 }
 
@@ -42,7 +43,7 @@ class ChatService {
     }
   }
 
-  onMessage(callback: (message: any) => void) {
+  onMessage(callback: (message: MessageType) => void) {
     this.messageCallbacks.push(callback);
     return () => {
       this.messageCallbacks = this.messageCallbacks.filter(cb => cb !== callback);
@@ -50,11 +51,14 @@ class ChatService {
   }
 
   async getContacts() {
-    const response = await api.get('/Chat/GetContacts');
+    const response = await api.get<Contact[]>('/Chat/GetContacts');
     return response.data;
   }
 
-  async getChats(toUserId: string) {
+  async getChats(toUserId: number) {
+    
+    console.log('To User Id Logu Burada !!!!!!!!!!!!!')
+    console.log(toUserId)
     const response = await api.get(`/Chat/GetChats?toUserId=${toUserId}`);
     return response.data;
   }
@@ -64,7 +68,7 @@ class ChatService {
     return response.data;
   }
 
-  async deleteChat(contactId: string) {
+  async deleteChat(contactId: number) {
     const response = await api.delete(`/Chat/DeleteChat/${contactId}`);
     return response.data;
   }
