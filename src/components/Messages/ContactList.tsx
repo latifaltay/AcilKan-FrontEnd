@@ -68,23 +68,26 @@ export const ContactList: React.FC<ContactListProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <span className="text-red-600 font-medium">
-                      {contact.userFullName.split(' ').map(n => n[0]).join('')}
-                    </span>
+                  <span className="text-red-600 font-medium">
+                    {contact.userFullName
+                      .split(' ')
+                      .map(n => n[0].toUpperCase())
+                      .join('')}
+                  </span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">{contact.userFullName}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{contact.userFullName.toUpperCase()}</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{contact.lastMessageInfo}</p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end space-y-1">
+                {/* <div className="flex flex-col items-end space-y-1">
                   <span className="text-xs text-gray-500 dark:text-gray-400">{contact.dateOnly}</span>
                   {contact.unread > 0 && (
                     <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
                       {contact.unread}
                     </span>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           ))

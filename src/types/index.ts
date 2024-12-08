@@ -31,11 +31,21 @@ export interface BloodRequest {
 }
 
 export interface Contact {
-  id: number;
   userFullName: string;
+  dateOnly: string;
   lastMessageInfo: string;
-  dateOnly : string;
-  unread: number;
+  unread?: number;
+  id: number;
+}
+
+export interface MessageInfo {
+  content: string;
+  sendDate: string;
+}
+
+export interface ChatResponse {
+  toUserFullName: string;
+  messageInfo: MessageInfo[];
 }
 
 export interface Message {

@@ -1,6 +1,6 @@
 import api from './api';
 import * as signalR from '@microsoft/signalr';
-import {Contact, Message as MessageType} from '../types' 
+import { Contact, Message as MessageType, ChatResponse } from '../types';
 
 interface Message {
   toUserId: number;
@@ -56,11 +56,26 @@ class ChatService {
   }
 
   async getChats(toUserId: number) {
+    // const response = await api.get<ChatResponse>(`/Chat/GetChats/${toUserId}`, {
+    //   headers: {
+    //     'toUserId': toUserId
+    //   }
+    // });
+    const response = await api.get<ChatResponse>(`/Chat/GetChats/${toUserId}`);
+
     
-    console.log('To User Id Logu Burada !!!!!!!!!!!!!')
-    console.log(toUserId)
-    const response = await api.get(`/Chat/GetChats?toUserId=${toUserId}`);
-    return response.data;
+    // Transform the response to match the expected format
+    return response.data.messageInfo.map((msg, index) => ({
+      id: index,
+      content: msg.content,
+      timestamp: new Date(msg.sendDate).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+      isOwn: index % 2 === 0, // This is a temporary solution, adjust based on your needs
+      senderId: index % 2 === 0 ? 1 : 2, // This is a temporary solution, adjust based on your needs
+      read: true
+    }));
   }
 
   async sendMessage(message: Message) {

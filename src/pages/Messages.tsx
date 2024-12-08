@@ -67,12 +67,28 @@ export default function Messages() {
     };
   }, [user]);
 
+  // useEffect(() => {
+  //   if (selectedContact) {
+  //     loadChatHistory(selectedContact.id);
+  //     setShowNewMessage(false);
+  //   }
+  // }, [selectedContact]);
+
+
   useEffect(() => {
-    if (selectedContact) {
-      loadChatHistory(selectedContact.id);
-      setShowNewMessage(false);
-    }
+    const fetchChatHistory = async () => {
+      if (selectedContact?.id !== undefined) { // ID kontrolü burada yapılıyor
+        await loadChatHistory(selectedContact.id);
+        setShowNewMessage(false);
+      } else {
+        console.error("Selected contact ID is undefined");
+      }
+    };
+  
+    fetchChatHistory();
   }, [selectedContact]);
+  
+
 
   useEffect(() => {
     scrollToBottom();
@@ -91,20 +107,44 @@ export default function Messages() {
     }
   };
 
+  // const loadChatHistory = async (contactId: number) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const history = await chatService.getChats(contactId);
+  //     setMessages(history ? history.map((msg: any) => ({
+  //       id: msg.id,
+  //       senderId: msg.senderId,
+  //       content: msg.content,
+  //       timestamp: new Date(msg.timestamp).toLocaleTimeString([], { 
+  //         hour: '2-digit', 
+  //         minute: '2-digit' 
+  //       }),
+  //       isOwn: msg.senderId === user?.id,
+  //       read: msg.read
+  //     })) : []);
+  //   } catch (error) {
+  //     console.error('Error loading chat history:', error);
+  //     setMessages([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const loadChatHistory = async (contactId: number) => {
     try {
       setIsLoading(true);
       const history = await chatService.getChats(contactId);
-      setMessages(history ? history.map((msg: any) => ({
-        id: msg.id,
-        senderId: msg.senderId,
+      setMessages(history ? history.messageInfo.map((msg, index) => ({
+        id: index,
+        senderId: index % 2 === 0 ? user?.id : contactId, // Alternate between user and contact
         content: msg.content,
-        timestamp: new Date(msg.timestamp).toLocaleTimeString([], { 
+        timestamp: new Date(msg.sendDate).toLocaleTimeString([], { 
           hour: '2-digit', 
           minute: '2-digit' 
         }),
-        isOwn: msg.senderId === user?.id,
-        read: msg.read
+        isOwn: index % 2 === 0, // Alternate message ownership
+        read: true,
+        text: msg.content
       })) : []);
     } catch (error) {
       console.error('Error loading chat history:', error);
@@ -113,6 +153,7 @@ export default function Messages() {
       setIsLoading(false);
     }
   };
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -170,15 +211,6 @@ export default function Messages() {
     setSelectedBloodRequestId(undefined);
     setMessageText('');
   };
-
-
-  // const filteredContacts = contacts.filter(contact =>
-  //   //contact.userFullName.toLowerCase().includes(searchQuery.toLowerCase()) 
-
-  //   console.log("🚀 ~ Messages ~ contact:", contact)
-  // ); 
-  
-  //console.log("🚀 ~ Messages ~ filteredContacts:", filteredContacts)
 
   const filteredContacts = contacts;
   
