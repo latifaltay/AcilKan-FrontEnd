@@ -36,6 +36,8 @@ export interface Contact {
   lastMessageInfo: string;
   unread?: number;
   id: number;
+  toUserId: number;
+  sendDate: string;
 }
 
 export interface MessageInfo {
@@ -51,9 +53,8 @@ export interface ChatResponse {
 export interface Message {
   id: number;
   senderId: number;
-  text: string;
+  content: string;
   timestamp: string;
   isOwn: boolean;
-  content: string;
   read?: boolean;
 }

@@ -48,8 +48,7 @@ export default function Messages() {
             content: message.content,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isOwn: message.senderId === user?.id,
-            read: false,
-            text: message.text
+            read: false
           }]);
         });
       } catch (error) {
@@ -67,38 +66,21 @@ export default function Messages() {
     };
   }, [user]);
 
-  // useEffect(() => {
-  //   if (selectedContact) {
-  //     loadChatHistory(selectedContact.id);
-  //     setShowNewMessage(false);
-  //   }
-  // }, [selectedContact]);
-
 
   useEffect(() => {
-    const fetchChatHistory = async () => {
-      if (selectedContact?.id !== undefined) { // ID kontrolü burada yapılıyor
-        await loadChatHistory(selectedContact.id);
-        setShowNewMessage(false);
-      } else {
-        console.error("Selected contact ID is undefined");
-      }
-    };
-  
-    fetchChatHistory();
+    if (selectedContact) {
+      console.log('Selected contact changed:', selectedContact);
+      loadChatHistory(selectedContact.toUserId); // Use toUserId instead of id
+      setShowNewMessage(false);
+    }
   }, [selectedContact]);
-  
 
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const loadContacts = async () => {
     try {
       setIsLoading(true);
       const contactsList = await chatService.getContacts();
-      console.log("🚀 ~ loadContacts ~ contactsList:", contactsList)
+      console.log('Loaded contacts:', contactsList); // Debug log
       setContacts(contactsList || []);
     } catch (error) {
       console.error('Error loading contacts:', error);
@@ -107,45 +89,32 @@ export default function Messages() {
     }
   };
 
-  // const loadChatHistory = async (contactId: number) => {
-  //   try {
-  //     setIsLoading(true);
-  //     const history = await chatService.getChats(contactId);
-  //     setMessages(history ? history.map((msg: any) => ({
-  //       id: msg.id,
-  //       senderId: msg.senderId,
-  //       content: msg.content,
-  //       timestamp: new Date(msg.timestamp).toLocaleTimeString([], { 
-  //         hour: '2-digit', 
-  //         minute: '2-digit' 
-  //       }),
-  //       isOwn: msg.senderId === user?.id,
-  //       read: msg.read
-  //     })) : []);
-  //   } catch (error) {
-  //     console.error('Error loading chat history:', error);
-  //     setMessages([]);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  const loadChatHistory = async (contactId: number) => {
+  const loadChatHistory = async (toUserId: number) => {
     try {
+      console.log('Loading chat history for contact:', toUserId); // Debug log
       setIsLoading(true);
-      const history = await chatService.getChats(contactId);
-      setMessages(history ? history.messageInfo.map((msg, index) => ({
-        id: index,
-        senderId: index % 2 === 0 ? user?.id : contactId, // Alternate between user and contact
-        content: msg.content,
-        timestamp: new Date(msg.sendDate).toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }),
-        isOwn: index % 2 === 0, // Alternate message ownership
-        read: true,
-        text: msg.content
-      })) : []);
+      const chatResponse = await chatService.getChats(toUserId);
+      
+      if (chatResponse && chatResponse.messageInfo) {
+        const formattedMessages = chatResponse.messageInfo
+          .filter(msg => msg.content) // Filter out empty messages
+          .map((msg, index) => ({
+            id: index,
+            senderId: user?.id || 0,
+            content: msg.content,
+            timestamp: new Date(msg.sendDate).toLocaleTimeString([], { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }),
+            isOwn: index % 2 === 0, // Alternate between sent and received messages
+            read: true
+          }));
+        
+        console.log('Formatted messages:', formattedMessages); // Debug log
+        setMessages(formattedMessages);
+      } else {
+        setMessages([]);
+      }
     } catch (error) {
       console.error('Error loading chat history:', error);
       setMessages([]);
@@ -153,11 +122,12 @@ export default function Messages() {
       setIsLoading(false);
     }
   };
-  
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleContactSelect = (contact: Contact) => {
+    console.log('Contact selected:', contact); // Debug log
+    setSelectedContact(contact);
   };
+
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,6 +148,11 @@ export default function Messages() {
         });
       }
       setMessageText('');
+      
+      // Reload chat history after sending message
+      if (selectedContact) {
+        loadChatHistory(selectedContact.id);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -212,8 +187,10 @@ export default function Messages() {
     setMessageText('');
   };
 
-  const filteredContacts = contacts;
-  
+  const filteredContacts = contacts.filter(contact =>
+    contact.userFullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -225,7 +202,7 @@ export default function Messages() {
               searchQuery={searchQuery}
               isLoading={isLoading}
               onSearchChange={setSearchQuery}
-              onSelectContact={setSelectedContact}
+              onSelectContact={handleContactSelect}
             />
             <ChatArea
               selectedContact={selectedContact}

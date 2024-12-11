@@ -18,7 +18,6 @@ export const ContactList: React.FC<ContactListProps> = ({
   isLoading,
   onSearchChange,
   onSelectContact,
-  
 }) => {
   const EmptyContacts = () => (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
@@ -33,6 +32,11 @@ export const ContactList: React.FC<ContactListProps> = ({
       </p>
     </div>
   );
+
+  const handleContactClick = (contact: Contact) => {
+    console.log('Contact clicked:', contact); // Debug log
+    onSelectContact(contact);
+  };
 
   return (
     <div className="col-span-4 border-r border-gray-200 dark:border-gray-700">
@@ -60,7 +64,7 @@ export const ContactList: React.FC<ContactListProps> = ({
           contacts.map(contact => (
             <div
               key={contact.id}
-              onClick={() => onSelectContact(contact)}
+              onClick={() => handleContactClick(contact)}
               className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${
                 selectedContact?.id === contact.id ? 'bg-gray-100 dark:bg-gray-700' : ''
               }`}
@@ -68,26 +72,18 @@ export const ContactList: React.FC<ContactListProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-red-600 font-medium">
-                    {contact.userFullName
-                      .split(' ')
-                      .map(n => n[0].toUpperCase())
-                      .join('')}
-                  </span>
+                    <span className="text-red-600 font-medium">
+                      {contact.userFullName
+                        .split(' ')
+                        .map(n => n[0].toUpperCase())
+                        .join('')}
+                    </span>
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900 dark:text-white">{contact.userFullName.toUpperCase()}</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{contact.lastMessageInfo}</p>
                   </div>
                 </div>
-                {/* <div className="flex flex-col items-end space-y-1">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{contact.dateOnly}</span>
-                  {contact.unread > 0 && (
-                    <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
-                      {contact.unread}
-                    </span>
-                  )}
-                </div> */}
               </div>
             </div>
           ))

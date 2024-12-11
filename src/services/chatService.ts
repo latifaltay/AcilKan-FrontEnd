@@ -51,31 +51,26 @@ class ChatService {
   }
 
   async getContacts() {
-    const response = await api.get<Contact[]>('/Chat/GetContacts');
-    return response.data;
+    try {
+      const response = await api.get<Contact[]>('/Chat/GetContacts');
+      console.log('Contacts loaded:', response.data); // Debug log
+      return response.data;
+    } catch (error) {
+      console.error('Error loading contacts:', error);
+      throw error;
+    }
   }
 
   async getChats(toUserId: number) {
-    // const response = await api.get<ChatResponse>(`/Chat/GetChats/${toUserId}`, {
-    //   headers: {
-    //     'toUserId': toUserId
-    //   }
-    // });
-    const response = await api.get<ChatResponse>(`/Chat/GetChats/${toUserId}`);
-
-    
-    // Transform the response to match the expected format
-    return response.data.messageInfo.map((msg, index) => ({
-      id: index,
-      content: msg.content,
-      timestamp: new Date(msg.sendDate).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      }),
-      isOwn: index % 2 === 0, // This is a temporary solution, adjust based on your needs
-      senderId: index % 2 === 0 ? 1 : 2, // This is a temporary solution, adjust based on your needs
-      read: true
-    }));
+    try {
+      console.log('Fetching chat history for userId:', toUserId); // Debug log
+      const response = await api.get<ChatResponse>(`/Chat/GetChats/${toUserId}`);
+      console.log('Chat history response:', response.data); // Debug log
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      throw error;
+    }
   }
 
   async sendMessage(message: Message) {
