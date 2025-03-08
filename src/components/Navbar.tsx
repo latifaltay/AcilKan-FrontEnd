@@ -1,37 +1,52 @@
-import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Droplet, Menu, Moon, Sun, X, User, Settings, LogOut } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
-import { useClickOutside } from '../hooks/useClickOutside';
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import {
+  Droplet,
+  Menu,
+  Moon,
+  Sun,
+  X,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
-  const {isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(profileDropdownRef, () => {
     setIsProfileOpen(false);
   });
-  const { user } = useAuth();  // Ensure 'user' is coming from your auth context
+  const { user } = useAuth(); // Ensure 'user' is coming from your auth context
 
   const handleLogout = () => {
     logout();
     setIsProfileOpen(false);
   };
-  
+
   const AuthenticatedNav = () => (
     <>
       <div className="hidden md:flex items-center space-x-4">
-        <Link to="/home" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link
+          to="/home"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           Anasayfa
         </Link>
-        <Link to="/activeUser" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        {/* <Link to="/activeUser" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
           Aktif Kullanıcılar
-        </Link>
-        <Link to="/messages" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        </Link> */}
+        <Link
+          to="/messages"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           Mesajlar
         </Link>
         <button
@@ -40,25 +55,20 @@ export default function Navbar() {
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
-        
+
         {/* Profile Dropdown */}
         <div className="relative" ref={profileDropdownRef}>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-
-        {/* bakılacak */}
-        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white">
-          {user?.name?.[1]?.toUpperCase() || 'X'}
-          {/* {user?.surname?.[0]?.toUpperCase() || 'X'} */}
-        </div>
-
-
-
-
+            {/* bakılacak */}
+            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white">
+              {user?.name?.[1]?.toUpperCase() || "X"}
+              {/* {user?.surname?.[0]?.toUpperCase() || 'X'} */}
+            </div>
           </button>
-          
+
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-50">
               <Link
@@ -146,20 +156,31 @@ export default function Navbar() {
     </>
   );
 
-  
   const UnauthenticatedNav = () => (
     <>
       <div className="hidden md:flex items-center space-x-4">
-        <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           Ana Sayfa
         </Link>
-        <Link to="/about" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link
+          to="/about"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           Hakkımızda
         </Link>
-        <Link to="/contact" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link
+          to="/contact"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           İletişim
         </Link>
-        <Link to="/blog" className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+        <Link
+          to="/blog"
+          className="text-gray-700 dark:text-gray-200 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+        >
           Blog
         </Link>
         <button
@@ -228,7 +249,9 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <Droplet className="h-8 w-8 text-red-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">KanDostum</span>
+              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+                KanDostum
+              </span>
             </Link>
           </div>
 
