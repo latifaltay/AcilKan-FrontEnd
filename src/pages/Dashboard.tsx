@@ -27,7 +27,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const ITEMS_PER_PAGE = 9;
+  const ITEMS_PER_PAGE = 16;
 
   useEffect(() => {
     loadBloodRequests();
