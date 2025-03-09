@@ -1,9 +1,9 @@
-import { MapPin, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { getRelativeTime } from '../utils/date';
-import { useContext } from 'react';
-import { BloodDonationContext } from '../context/BloodDonationContext';
+import { MapPin, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
+import { getRelativeTime } from "../utils/date";
+import { useContext } from "react";
+import { BloodDonationContext } from "../context/BloodDonationContext";
 
 interface BloodRequest {
   id: number;
@@ -21,32 +21,33 @@ interface BloodRequest {
 
 interface Props {
   request: BloodRequest;
+  onContact: () => void;
+  onDonate: () => void;
 }
 
 export default function BloodRequestCard({ request }: Props) {
   const navigate = useNavigate();
 
-  const {setSelectedBloodRequestId} =  useContext(BloodDonationContext)
+  const { setSelectedBloodRequestId } = useContext(BloodDonationContext);
 
   const handleContact = () => {
     setSelectedBloodRequestId(request.id);
 
-    navigate("/messages")
+    navigate("/messages");
   };
-console.log("AAAAAAAAA: ",request)
 
   const handleDonate = async () => {
     try {
-      const response = await api.post('/BloodDonation', {
+      const response = await api.post("/BloodDonation", {
         bloodRequestId: request.id,
         isActive: true,
       });
 
       if (response.status === 200) {
-        console.log('Bağış isteği başarıyla gönderildi!');
+        console.log("Bağış isteği başarıyla gönderildi!");
       }
     } catch (error) {
-      console.error('Bağış isteği sırasında hata oluştu:', error);
+      console.error("Bağış isteği sırasında hata oluştu:", error);
     }
   };
 
@@ -55,7 +56,7 @@ console.log("AAAAAAAAA: ",request)
       <div className="flex justify-between items-start mb-3">
         <div>
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-            {request.bloodGroupName || 'Belirtilmemiş'}
+            {request.bloodGroupName || "Belirtilmemiş"}
           </span>
           <h4 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
             {request.hospitalName}
