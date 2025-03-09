@@ -1,6 +1,30 @@
-import { Heart, Users, Clock } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Heart, Users, Clock } from "lucide-react";
+import { UserInformationService } from "../services/UserInformationService"; // ✅ API servis dosyasını ekledik
 
 export default function DashboardStats() {
+  const [stats, setStats] = useState({
+    totalDonations: 0,
+    nextDonationDays: "Bilinmiyor",
+    lastDonation: "Bilinmiyor",
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    const data = await UserInformationService.getHomePageChartByUserId();
+
+    if (data) {
+      setStats({
+        totalDonations: data.donationCount || 0,
+        nextDonationDays: data.lastDonationDate || "Bilinmiyor",
+        lastDonation: data.nextDonationDate || "Bilinmiyor",
+      });
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -13,7 +37,7 @@ export default function DashboardStats() {
               Toplam Bağış
             </p>
             <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-              8
+              {stats.totalDonations}
             </p>
           </div>
         </div>
@@ -29,7 +53,7 @@ export default function DashboardStats() {
               Yeni Bağış Yapabilme
             </p>
             <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-              15 gün sonra
+              {stats.nextDonationDays}
             </p>
           </div>
         </div>
@@ -45,7 +69,7 @@ export default function DashboardStats() {
               Son Bağış
             </p>
             <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-              3 ay önce
+              {stats.lastDonation}
             </p>
           </div>
         </div>

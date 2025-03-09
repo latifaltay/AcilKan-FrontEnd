@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { MessageSquare, User } from "lucide-react";
+import { useState, useEffect } from "react";
 import BloodRequestCard from "../components/BloodRequestCard";
 import DashboardStats from "../components/DashboardStats";
 import RequestModal from "../components/RequestModal";
@@ -8,6 +6,7 @@ import { bloodRequestService } from "../services/bloodRequestService";
 
 interface BloodRequest {
   id: number;
+  appUserId: number;
   appUserFullName: string;
   bloodGroupName: string | null;
   hospitalName: string;
@@ -21,7 +20,6 @@ interface BloodRequest {
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,40 +56,32 @@ export default function Dashboard() {
     loadBloodRequests();
   };
 
-  const mockNearbyUsers = [
-    {
-      id: 1,
-      name: "Ayşe Demir",
-      bloodType: "A Rh+",
-      location: "Kadıköy, İstanbul",
-      distance: "1 km",
-      lastActive: "5 dk önce",
-    },
-    {
-      id: 2,
-      name: "Mehmet Kaya",
-      bloodType: "B Rh-",
-      location: "Üsküdar, İstanbul",
-      distance: "3 km",
-      lastActive: "10 dk önce",
-    },
-    {
-      id: 3,
-      name: "Ali Yılmaz",
-      bloodType: "0 Rh+",
-      location: "Beşiktaş, İstanbul",
-      distance: "5 km",
-      lastActive: "15 dk önce",
-    },
-  ];
-
-  const handleMessageUser = (userId: number) => {
-    navigate(`/messages/${userId}`);
-  };
-
-  const handleViewProfile = (userId: number) => {
-    navigate(`/user/${userId}`);
-  };
+  // const mockNearbyUsers = [
+  //   {
+  //     id: 1,
+  //     name: "Ayşe Demir",
+  //     bloodType: "A Rh+",
+  //     location: "Kadıköy, İstanbul",
+  //     distance: "1 km",
+  //     lastActive: "5 dk önce",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Mehmet Kaya",
+  //     bloodType: "B Rh-",
+  //     location: "Üsküdar, İstanbul",
+  //     distance: "3 km",
+  //     lastActive: "10 dk önce",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Ali Yılmaz",
+  //     bloodType: "0 Rh+",
+  //     location: "Beşiktaş, İstanbul",
+  //     distance: "5 km",
+  //     lastActive: "15 dk önce",
+  //   },
+  // ];
 
   const handleContactRequest = (requestId: number) => {
     // Handle contact request

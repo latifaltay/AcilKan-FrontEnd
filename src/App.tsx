@@ -25,6 +25,9 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import { useScrollToTop } from "./hooks/useScrollToTop";
 import { BloodDonationProvider } from "./context/BloodDonationContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DatePicker from "react-datepicker";
 
 function ScrollToTop() {
   useScrollToTop();
@@ -40,6 +43,8 @@ function App() {
             <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
               <ScrollToTop />
               <Navbar />
+              <ToastContainer />
+              <DatePicker />{" "}
               <Routes>
                 {/* Public Routes */}
                 <Route
@@ -56,6 +61,7 @@ function App() {
                 <Route path="/blog/:id" element={<BlogDetail />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
+
                 <Route
                   path="/login"
                   element={
@@ -88,7 +94,6 @@ function App() {
                     </PublicRoute>
                   }
                 />
-
                 {/* Protected Routes */}
                 <Route
                   path="/home"
