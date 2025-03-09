@@ -13,7 +13,7 @@ interface BloodRequest {
   city: string;
   district: string;
   isActive: boolean;
-  createdDate: string;
+  requestDate: string;
   patientFullName: string;
   status: string;
 }

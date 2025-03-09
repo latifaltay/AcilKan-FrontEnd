@@ -6,15 +6,17 @@ import { useContext } from "react";
 import { BloodDonationContext } from "../context/BloodDonationContext";
 
 interface BloodRequest {
-  id: number;
-  appUserId: number;
-  appUserFullName: string;
+  requestId: number;
+  requesterId: number;
+  requiredUnits: number;
+  requesterFullName: string;
   bloodGroupName: string | null;
   hospitalName: string;
+  isIndependentDonation: boolean;
   city: string;
   district: string;
   isActive: boolean;
-  createdDate: string;
+  requestDate: string;
   patientFullName: string;
   status: string;
 }
@@ -31,7 +33,7 @@ export default function BloodRequestCard({ request }: Props) {
   const { setSelectedBloodRequestId } = useContext(BloodDonationContext);
 
   const handleContact = () => {
-    setSelectedBloodRequestId(request.id);
+    setSelectedBloodRequestId(request.requestId);
 
     navigate("/messages");
   };
@@ -39,7 +41,7 @@ export default function BloodRequestCard({ request }: Props) {
   const handleDonate = async () => {
     try {
       const response = await api.post("/BloodDonation", {
-        bloodRequestId: request.id,
+        bloodRequestId: request.requestId,
         isActive: true,
       });
 
@@ -70,13 +72,19 @@ export default function BloodRequestCard({ request }: Props) {
         </p>
         <p className="flex items-center">
           <Clock className="h-4 w-4 mr-1" />
-          {getRelativeTime(request.createdDate)}
+          {getRelativeTime(request.requestDate)}
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Hasta: {request.patientFullName}
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Talep Eden: {request.appUserFullName}
+          Talep Eden: {request.requesterFullName}
+        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Gerekli Kan Ünitesi: {request.requiredUnits}
+        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Hastane Bağımlı: {request.isIndependentDonation ? "Evet" : "Hayır"}
         </p>
       </div>
       <div className="flex space-x-2">
