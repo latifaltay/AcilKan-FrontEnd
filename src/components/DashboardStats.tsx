@@ -4,9 +4,9 @@ import { UserInformationService } from "../services/UserInformationService"; // 
 
 export default function DashboardStats() {
   const [stats, setStats] = useState({
-    totalDonations: 0,
-    nextDonationDays: "Bilinmiyor",
-    lastDonation: "Bilinmiyor",
+    totalDonations: "",
+    nextDonationDays: "",
+    lastDonation: "",
   });
 
   useEffect(() => {
