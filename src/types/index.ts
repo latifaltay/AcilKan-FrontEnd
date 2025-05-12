@@ -30,31 +30,39 @@ export interface BloodRequest {
   createdAt: string;
 }
 
-export interface Contact {
-  userFullName: string;
-  dateOnly: string;
-  lastMessageInfo: string;
-  unread?: number;
+export interface ChatUser {
   id: number;
-  toUserId: number;
-  sendDate: string;
+  name: string;
+  avatar?: string;
+  bloodType: string;
+  lastActive: string;
+  isOnline: boolean;
 }
 
-export interface MessageInfo {
-  content: string;
-  sendDate: string;
-}
-
-export interface ChatResponse {
-  toUserFullName: string;
-  messageInfo: MessageInfo[];
-}
-
-export interface Message {
+export interface ChatMessage {
   id: number;
   senderId: number;
+  receiverId: number;
   content: string;
   timestamp: string;
+  isRead: boolean;
   isOwn: boolean;
-  read?: boolean;
+}
+
+export interface ChatConversation {
+  id: number;
+  participants: ChatUser[];
+  lastMessage: ChatMessage | null;
+  unreadCount: number;
+  updatedAt: string;
+}
+
+export interface Notification {
+  id: number;
+  type: 'message' | 'blood_request' | 'donation';
+  title: string;
+  message: string;
+  isRead: boolean;
+  timestamp: string;
+  link?: string;
 }

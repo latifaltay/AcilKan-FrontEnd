@@ -1,4 +1,4 @@
-import { MapPin, Clock } from "lucide-react";
+import { MapPin, Clock, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { getRelativeTime } from "../utils/date";
@@ -33,7 +33,7 @@ export default function BloodRequestCard({ request }: Props) {
   const handleContact = () => {
     setSelectedBloodRequestId(request.id);
 
-    navigate("/messages");
+    navigate("/messages", { state: { selectedUserId: request.appUserId } });
   };
 
   const handleDonate = async () => {
@@ -49,6 +49,12 @@ export default function BloodRequestCard({ request }: Props) {
     } catch (error) {
       console.error("Bağış isteği sırasında hata oluştu:", error);
     }
+  };
+
+  const urgencyColors = {
+    high: 'bg-red-100 text-red-800',
+    medium: 'bg-yellow-100 text-yellow-800',
+    low: 'bg-green-100 text-green-800'
   };
 
   return (
@@ -84,6 +90,7 @@ export default function BloodRequestCard({ request }: Props) {
           onClick={handleContact}
           className="flex-1 text-xs bg-red-600 text-white px-2 py-1.5 rounded hover:bg-red-700 transition-colors"
         >
+          <MessageCircle className="h-4 w-4 mr-2" />
           İletişime Geç
         </button>
         <button

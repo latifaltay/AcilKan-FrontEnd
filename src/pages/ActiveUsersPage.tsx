@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, User, Search, MapPin, Filter } from 'lucide-react';
+import { User, Search, MapPin, Filter } from 'lucide-react';
 
 interface ActiveUser {
   id: number;
@@ -64,10 +64,6 @@ export function ActiveUsersPage() {
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
-
-  const handleMessageUser = (userId: number) => {
-    navigate(`/messages/${userId}`);
-  };
 
   const handleViewProfile = (userId: number) => {
     navigate(`/user/${userId}`);
@@ -180,15 +176,8 @@ export function ActiveUsersPage() {
 
               <div className="flex justify-between pt-4 border-t dark:border-gray-700">
                 <button
-                  onClick={() => handleMessageUser(user.id)}
-                  className="flex items-center justify-center w-1/2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Mesaj
-                </button>
-                <button
                   onClick={() => handleViewProfile(user.id)}
-                  className="flex items-center justify-center w-1/2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Profil
