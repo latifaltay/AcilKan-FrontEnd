@@ -139,9 +139,28 @@ export default function Messages() {
 
     setMessageText("");
     try {
-      const sent = signalrService.isConnected()
-        ? await signalrService.sendMessage(selectedConversation.id, content)
-        : await conversationService.sendMessage(selectedConversation.id, content);
+      let sent: MessageDto;
+      if (signalrService.isConnected()) {
+        try {
+          sent = await signalrService.sendMessage(
+            selectedConversation.id,
+            content
+          );
+        } catch (hubError) {
+          // Hub düşmüş / invoke hata vermişse REST fallback.
+          console.warn("SignalR mesaj gönderimi başarısız, REST deneniyor:", hubError);
+          sent = await conversationService.sendMessage(
+            selectedConversation.id,
+            content
+          );
+        }
+      } else {
+        sent = await conversationService.sendMessage(
+          selectedConversation.id,
+          content
+        );
+      }
+
       setMessages((prev) => {
         if (prev.some((m) => m.id === sent.id)) return prev;
         return [...prev, sent];

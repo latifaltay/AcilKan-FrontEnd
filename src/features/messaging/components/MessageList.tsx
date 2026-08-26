@@ -42,7 +42,8 @@ export const MessageList: React.FC<MessageListProps> = ({
         <EmptyMessages />
       ) : (
         messages.map((message) => {
-          const isOwn = message.senderId === currentUserId;
+          const isOwn =
+            message.senderId.toLowerCase() === currentUserId.toLowerCase();
           return (
             <div
               key={message.id}

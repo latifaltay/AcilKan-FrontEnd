@@ -48,9 +48,18 @@ class SignalrService {
       );
 
       this.connection.onclose(() => {
+        this.startPromise = null;
         if (!this.stoppedByUser) {
           this.scheduleReconnect();
         }
+      });
+
+      this.connection.onreconnecting(() => {
+        this.startPromise = null;
+      });
+
+      this.connection.onreconnected(() => {
+        this.startPromise = null;
       });
     }
 
@@ -58,7 +67,7 @@ class SignalrService {
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnectTimer) return;
+    if (this.reconnectTimer || this.stoppedByUser) return;
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       this.start().catch(() => {
@@ -75,12 +84,24 @@ class SignalrService {
       return;
     }
 
+    if (
+      connection.state === signalR.HubConnectionState.Connecting ||
+      connection.state === signalR.HubConnectionState.Reconnecting
+    ) {
+      if (this.startPromise) return this.startPromise;
+    }
+
     if (!this.startPromise) {
-      this.startPromise = connection.start().catch((error) => {
-        this.startPromise = null;
-        this.scheduleReconnect();
-        throw error;
-      });
+      this.startPromise = connection
+        .start()
+        .then(() => {
+          this.startPromise = null;
+        })
+        .catch((error) => {
+          this.startPromise = null;
+          this.scheduleReconnect();
+          throw error;
+        });
     }
 
     return this.startPromise;
@@ -92,13 +113,13 @@ class SignalrService {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.startPromise = null;
     if (
       this.connection &&
       this.connection.state !== signalR.HubConnectionState.Disconnected
     ) {
       await this.connection.stop();
     }
-    this.startPromise = null;
   }
 
   onReceiveMessage(listener: MessageListener): () => void {

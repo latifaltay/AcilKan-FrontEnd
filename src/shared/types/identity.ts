@@ -11,7 +11,7 @@ export interface AuthResponse {
   name: string;
   surname: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   token: AuthToken;
 }
 

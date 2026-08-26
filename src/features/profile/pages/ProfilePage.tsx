@@ -7,12 +7,13 @@ import { formatDate } from "../../../shared/lib/date";
 import { accountService } from "../../../shared/api/accountService";
 import { bloodDonationService } from "../../donations/bloodDonationService";
 import type {
+  BloodDonationStatus,
   MyDonationOfferDto,
   MyProfileDto,
   ReceivedDonationItemDto,
 } from "../../../shared/types";
 
-const OFFER_STATUS_LABELS: Record<MyDonationOfferDto["status"], string> = {
+const OFFER_STATUS_LABELS: Record<BloodDonationStatus, string> = {
   Pending: "Beklemede",
   Accepted: "Kabul Edildi",
   Confirmed: "Onaylandı",
@@ -21,7 +22,7 @@ const OFFER_STATUS_LABELS: Record<MyDonationOfferDto["status"], string> = {
   Expired: "Süresi Doldu",
 };
 
-const OFFER_STATUS_COLORS: Record<MyDonationOfferDto["status"], string> = {
+const OFFER_STATUS_COLORS: Record<BloodDonationStatus, string> = {
   Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   Accepted: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   Confirmed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -253,16 +254,16 @@ export function ProfilePage() {
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-700">
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Tarih
+                          Teklif Tarihi
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Bağışçı
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Hasta
+                          Hastane
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Kan Grubu
+                          Durum
                         </th>
                       </tr>
                     </thead>
@@ -270,16 +271,20 @@ export function ProfilePage() {
                       {receivedDonations.map((donation) => (
                         <tr key={donation.id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                            {formatDate(donation.confirmedAt)}
+                            {formatDate(donation.offeredDate)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                             {donation.donorName} {donation.donorSurname}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                            {donation.patientName} {donation.patientSurname}
+                            {donation.hospitalName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                            {getBloodGroupLabel(donation.bloodGroup)}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${OFFER_STATUS_COLORS[donation.status]}`}
+                            >
+                              {OFFER_STATUS_LABELS[donation.status]}
+                            </span>
                           </td>
                         </tr>
                       ))}
@@ -287,7 +292,7 @@ export function ProfilePage() {
                   </table>
                   {receivedDonations.length === 0 && (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      Henüz onaylanmış bir bağış almadınız.
+                      Taleplerinize henüz bir bağış teklifi gelmedi.
                     </div>
                   )}
                 </div>

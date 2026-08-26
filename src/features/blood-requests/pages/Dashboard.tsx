@@ -3,7 +3,10 @@ import BloodRequestCard from "../components/BloodRequestCard";
 import DashboardStats from "../components/DashboardStats";
 import RequestModal from "../components/RequestModal";
 import { bloodRequestService } from "../bloodRequestService";
+import { locationService, type City, type District } from "../../../shared/api/locationService";
 import { getApiErrorMessage } from "../../../shared/api/apiError";
+import { readCityIdFromAccessToken } from "../../../shared/lib/jwt";
+import { Select } from "../../../shared/ui/Select";
 import type { BloodRequestDto } from "../../../shared/types";
 
 const PAGE_SIZE = 16;
@@ -16,23 +19,82 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadBloodRequests = useCallback(async (pageNumber: number) => {
-    try {
-      setLoading(true);
-      const data = await bloodRequestService.getAllBloodRequests(
-        pageNumber,
-        PAGE_SIZE
-      );
-      setBloodRequests(data.items);
-      setTotalPages(data.totalPages || 1);
-      setError(null);
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Kan talepleri yüklenirken bir hata oluştu."));
-      console.error("Error loading blood requests:", err);
-    } finally {
-      setLoading(false);
-    }
+  const [cities, setCities] = useState<City[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [cityId, setCityId] = useState("");
+  const [districtId, setDistrictId] = useState("");
+
+  useEffect(() => {
+    locationService
+      .getCities()
+      .then((list) => {
+        setCities(list);
+        const tokenCityId = readCityIdFromAccessToken();
+        if (tokenCityId && list.some((c) => c.id === tokenCityId)) {
+          setCityId(String(tokenCityId));
+        }
+      })
+      .catch((err) => console.error("Şehirler yüklenemedi:", err));
   }, []);
+
+  useEffect(() => {
+    if (!cityId) {
+      setDistricts([]);
+      setDistrictId("");
+      return;
+    }
+
+    let cancelled = false;
+    locationService
+      .getDistrictsByCityId(parseInt(cityId, 10))
+      .then((list) => {
+        if (!cancelled) {
+          setDistricts(list);
+        }
+      })
+      .catch((err) => console.error("İlçeler yüklenemedi:", err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cityId]);
+
+  const loadBloodRequests = useCallback(
+    async (pageNumber: number) => {
+      try {
+        setLoading(true);
+        const data = districtId
+          ? await bloodRequestService.getBloodRequestsByDistrict(
+              parseInt(districtId, 10),
+              pageNumber,
+              PAGE_SIZE
+            )
+          : cityId
+          ? await bloodRequestService.getBloodRequestsByCity(
+              parseInt(cityId, 10),
+              pageNumber,
+              PAGE_SIZE
+            )
+          : await bloodRequestService.getAllBloodRequests(pageNumber, PAGE_SIZE);
+
+        setBloodRequests(data.items);
+        setTotalPages(data.totalPages || 1);
+        setError(null);
+      } catch (err) {
+        setError(
+          getApiErrorMessage(err, "Kan talepleri yüklenirken bir hata oluştu.")
+        );
+        console.error("Error loading blood requests:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [cityId, districtId]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [cityId, districtId]);
 
   useEffect(() => {
     loadBloodRequests(currentPage);
@@ -53,7 +115,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -65,21 +126,48 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats */}
         <DashboardStats />
 
-        {/* Main Content */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Blood Requests */}
           <div className="lg:col-span-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Kan İhtiyaçları
-                </h2>
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                    Kan İhtiyaçları
+                  </h2>
+                  <div className="mt-3 flex flex-col sm:flex-row gap-3">
+                    <Select
+                      label="İl"
+                      value={cityId}
+                      onChange={(e) => {
+                        setCityId(e.target.value);
+                        setDistrictId("");
+                      }}
+                      placeholder="Tüm iller"
+                      options={cities.map((city) => ({
+                        value: city.id,
+                        label: city.name,
+                      }))}
+                      className="min-w-[160px]"
+                    />
+                    <Select
+                      label="İlçe"
+                      value={districtId}
+                      onChange={(e) => setDistrictId(e.target.value)}
+                      placeholder="Tüm ilçeler"
+                      disabled={!cityId}
+                      options={districts.map((district) => ({
+                        value: district.id,
+                        label: district.name,
+                      }))}
+                      className="min-w-[160px]"
+                    />
+                  </div>
+                </div>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 shrink-0"
                 >
                   Kan İhtiyacı Oluştur
                 </button>
@@ -100,7 +188,7 @@ export default function Dashboard() {
                 ) : bloodRequests.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-600 dark:text-gray-400">
-                      Henüz kan talebi bulunmuyor.
+                      Seçilen bölgede henüz kan talebi bulunmuyor.
                     </p>
                   </div>
                 ) : (
@@ -111,7 +199,6 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-6 flex justify-center space-x-2">
                     <button

@@ -84,13 +84,12 @@ export interface BloodDonationOfferDto {
 export interface ReceivedDonationItemDto {
   id: string;
   bloodRequestId: string;
-  donorId: string;
   donorName: string;
   donorSurname: string;
-  patientName: string;
-  patientSurname: string;
-  bloodGroup: BloodGroupType;
-  confirmedAt: string;
+  hospitalName: string;
+  status: BloodDonationStatus;
+  offeredDate: string;
+  confirmedAt: string | null;
 }
 
 export interface DashboardSummaryDto {

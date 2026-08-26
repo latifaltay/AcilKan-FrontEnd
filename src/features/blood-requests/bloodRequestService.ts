@@ -10,7 +10,8 @@ export interface CreateBloodRequestPayload {
   requiredUnits: number;
   isDonorCompatibilityRequired: boolean;
   isHospitalSpecific: boolean;
-  hospitalId?: number | null;
+  /** Backend her zaman geçerli hastane ister (int > 0). */
+  hospitalId: number;
 }
 
 class BloodRequestService {

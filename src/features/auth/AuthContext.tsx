@@ -31,7 +31,7 @@ function toAuthUser(response: AuthResponse): AuthUser {
     name: response.name,
     surname: response.surname,
     email: response.email,
-    phoneNumber: response.phoneNumber,
+    phoneNumber: response.phoneNumber ?? "",
   };
 }
 

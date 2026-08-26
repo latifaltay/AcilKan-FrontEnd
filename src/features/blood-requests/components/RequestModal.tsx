@@ -24,8 +24,8 @@ const initialFormData = {
   bloodGroup: "" as BloodGroupType | "",
   requiredUnits: "1",
   /** v1: backend her zaman exact uyumluluk yazar; UI seçeneği yakında. */
-  /** v1: backend her zaman exact uyumluluk yazar; UI seçeneği yakında. */
   isDonorCompatibilityRequired: true,
+  /** Hastane seçimi her zaman zorunlu; bu bayrak yalnızca görünürlük/kapsam içindir. */
   isHospitalSpecific: false,
   cityId: "",
   districtId: "",
@@ -99,8 +99,8 @@ export default function RequestModal({ isOpen, onClose, onSuccess }: Props) {
       return;
     }
 
-    if (formData.isHospitalSpecific && !formData.hospitalId) {
-      setError("Belirli bir hastane seçtiyseniz hastaneyi belirtmelisiniz.");
+    if (!formData.hospitalId) {
+      setError("Lütfen kan bağışının yapılacağı hastaneyi seçin.");
       return;
     }
 
@@ -114,9 +114,7 @@ export default function RequestModal({ isOpen, onClose, onSuccess }: Props) {
         requiredUnits: parseInt(formData.requiredUnits) || 1,
         isDonorCompatibilityRequired: true,
         isHospitalSpecific: formData.isHospitalSpecific,
-        hospitalId: formData.isHospitalSpecific
-          ? parseInt(formData.hospitalId)
-          : null,
+        hospitalId: parseInt(formData.hospitalId),
       });
       toast.success("Kan talebiniz oluşturuldu.");
       onSuccess?.();
@@ -230,6 +228,50 @@ export default function RequestModal({ isOpen, onClose, onSuccess }: Props) {
             </span>
           </label>
 
+          <div className="space-y-4">
+            <Select
+              label="İl"
+              fullWidth
+              required
+              placeholder="İl Seçiniz"
+              value={formData.cityId}
+              onChange={(e) =>
+                setFormData({ ...formData, cityId: e.target.value })
+              }
+              options={cities.map((city) => ({ value: city.id, label: city.name }))}
+            />
+            <Select
+              label="İlçe"
+              fullWidth
+              required
+              disabled={!formData.cityId}
+              placeholder="İlçe Seçiniz"
+              value={formData.districtId}
+              onChange={(e) =>
+                setFormData({ ...formData, districtId: e.target.value })
+              }
+              options={districts.map((district) => ({
+                value: district.id,
+                label: district.name,
+              }))}
+            />
+            <Select
+              label="Hastane"
+              fullWidth
+              required
+              disabled={!formData.districtId}
+              placeholder="Hastane Seçiniz"
+              value={formData.hospitalId}
+              onChange={(e) =>
+                setFormData({ ...formData, hospitalId: e.target.value })
+              }
+              options={hospitals.map((hospital) => ({
+                value: hospital.id,
+                label: hospital.name,
+              }))}
+            />
+          </div>
+
           <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
             <input
               type="checkbox"
@@ -239,54 +281,13 @@ export default function RequestModal({ isOpen, onClose, onSuccess }: Props) {
               }
               className="rounded text-red-600 focus:ring-red-500"
             />
-            Belirli bir hastanede ihtiyaç var
+            <span>
+              Yalnızca bu hastanedeki bağışçılara görünsün
+              <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                (kapalıysa daha geniş bölgede de görünür)
+              </span>
+            </span>
           </label>
-
-          {formData.isHospitalSpecific && (
-            <div className="space-y-4 pl-1 border-l-2 border-red-200 dark:border-red-900">
-              <Select
-                label="İl"
-                fullWidth
-                required
-                placeholder="İl Seçiniz"
-                value={formData.cityId}
-                onChange={(e) =>
-                  setFormData({ ...formData, cityId: e.target.value })
-                }
-                options={cities.map((city) => ({ value: city.id, label: city.name }))}
-              />
-              <Select
-                label="İlçe"
-                fullWidth
-                required
-                disabled={!formData.cityId}
-                placeholder="İlçe Seçiniz"
-                value={formData.districtId}
-                onChange={(e) =>
-                  setFormData({ ...formData, districtId: e.target.value })
-                }
-                options={districts.map((district) => ({
-                  value: district.id,
-                  label: district.name,
-                }))}
-              />
-              <Select
-                label="Hastane"
-                fullWidth
-                required
-                disabled={!formData.districtId}
-                placeholder="Hastane Seçiniz"
-                value={formData.hospitalId}
-                onChange={(e) =>
-                  setFormData({ ...formData, hospitalId: e.target.value })
-                }
-                options={hospitals.map((hospital) => ({
-                  value: hospital.id,
-                  label: hospital.name,
-                }))}
-              />
-            </div>
-          )}
 
           {error && (
             <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-2 rounded">

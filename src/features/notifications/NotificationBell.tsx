@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { toast } from "react-toastify";
 import { notificationService } from "./notificationService";
@@ -7,7 +8,20 @@ import { useClickOutside } from "../../shared/hooks/useClickOutside";
 import { formatDate } from "../../shared/lib/date";
 import type { NotificationDto } from "../../shared/types";
 
+function readConversationId(data: string | null): string | null {
+  if (!data) return null;
+  try {
+    const parsed = JSON.parse(data) as { conversationId?: string };
+    return typeof parsed.conversationId === "string"
+      ? parsed.conversationId
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function NotificationBell() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationDto[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -83,15 +97,25 @@ export default function NotificationBell() {
     if (next) loadNotifications();
   };
 
-  const handleMarkRead = async (id: string) => {
+  const handleOpenNotification = async (notification: NotificationDto) => {
     try {
-      await notificationService.markRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      if (!notification.isRead) {
+        await notificationService.markRead(notification.id);
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notification.id ? { ...n, isRead: true } : n
+          )
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
     } catch (error) {
       console.error("Bildirim okundu olarak işaretlenemedi:", error);
+    }
+
+    const conversationId = readConversationId(notification.data);
+    if (conversationId) {
+      setIsOpen(false);
+      navigate(`/messages?conversationId=${conversationId}`);
     }
   };
 
@@ -147,7 +171,7 @@ export default function NotificationBell() {
             notifications.map((notification) => (
               <button
                 key={notification.id}
-                onClick={() => handleMarkRead(notification.id)}
+                onClick={() => handleOpenNotification(notification)}
                 className={`block w-full text-left px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
                   notification.isRead ? "" : "bg-red-50 dark:bg-red-900/20"
                 }`}

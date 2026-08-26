@@ -66,9 +66,7 @@ export default function BloodRequestCard({ request }: Props) {
       </div>
 
       <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-        {request.isHospitalSpecific && request.hospitalName
-          ? request.hospitalName
-          : "Belirli olmayan hastane"}
+        {request.hospitalName || "Hastane bilgisi yok"}
       </h4>
 
       <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300 mb-3">
