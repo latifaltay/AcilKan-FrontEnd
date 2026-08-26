@@ -11,6 +11,15 @@ node_modules
 dist
 dist-ssr
 *.local
+.vite
+.bolt
+*.tsbuildinfo
+_recovery
+
+# Env files
+.env
+.env.local
+.env.*.local
 
 # Editor directories and files
 .vscode/*
